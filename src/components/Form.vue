@@ -24,7 +24,7 @@
     <div class="flex flex-col gap-2">
       <label for="ktp_picture">Foto KTP</label>
       <div @change="(event) => (this.ktp_picture = event.target.files)" :class="{ 'border-red-500': v$.ktp_picture.$error }" class="bg-white flex items-center focus-within:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none appearance-none">
-        <input id="ktp_picture" type="file" class="focus:outline-none" />
+        <input id="ktp_picture" type="file" accept="image/jpg, image/jpeg, image/png, image/bmp" class="focus:outline-none" />
       </div>
       <span class="text-red-500" v-if="v$.ktp_picture.$error">
         {{ v$.ktp_picture.$errors[0].$message }}
@@ -33,7 +33,7 @@
     <div class="flex flex-col gap-2">
       <label for="kk_picture">Foto Kartu Keluarga</label>
       <div @change="(event) => (this.kk_picture = event.target.files)" :class="{ 'border-red-500': v$.kk_picture.$error }" class="bg-white flex items-center focus-within:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none appearance-none">
-        <input id="kk_picture" type="file" class="focus:outline-none" />
+        <input id="kk_picture" type="file" accept="image/jpg, image/jpeg, image/png, image/bmp" class="focus:outline-none" />
       </div>
       <span class="text-red-500" v-if="v$.kk_picture.$error">
         {{ v$.kk_picture.$errors[0].$message }}
