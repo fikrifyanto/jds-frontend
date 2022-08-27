@@ -296,22 +296,22 @@ export default {
   },
   methods: {
     getProvince: function () {
-      fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/provinces.json`)
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json`)
         .then((response) => response.json())
         .then((provinces) => (this.provinces = provinces));
     },
     getRegencies: function (province) {
-      fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/regencies/${province}.json`)
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${province}.json`)
         .then((response) => response.json())
         .then((regencies) => (this.regencies = regencies));
     },
     getDistrics: function (regency) {
-      fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/districts/${regency}.json`)
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${regency}.json`)
         .then((response) => response.json())
         .then((districts) => (this.districts = districts));
     },
     getVillages: function (district) {
-      fetch(`http://www.emsifa.com/api-wilayah-indonesia/api/villages/${district}.json`)
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${district}.json`)
         .then((response) => response.json())
         .then((villages) => (this.villages = villages));
     },
