@@ -9,14 +9,14 @@
     </div>
     <div class="flex flex-col gap-2">
       <label for="nik">NIK</label>
-      <input v-model="nik" id="nik" :class="{ 'border-red-500': v$.nik.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
+      <input v-model="nik" id="nik" :class="{ 'border-red-500': v$.nik.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="number" />
       <span class="text-red-500" v-if="v$.nik.$error">
         {{ v$.nik.$errors[0].$message }}
       </span>
     </div>
     <div class="flex flex-col gap-2">
       <label for="kk">Nomor Kartu Keluarga</label>
-      <input v-model="kk" id="kk" :class="{ 'border-red-500': v$.kk.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
+      <input v-model="kk" id="kk" :class="{ 'border-red-500': v$.kk.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="number" />
       <span class="text-red-500" v-if="v$.kk.$error">
         {{ v$.kk.$errors[0].$message }}
       </span>
@@ -119,14 +119,14 @@
     </div>
     <div class="flex flex-col gap-2">
       <label for="incomeBefore">Penghasilan sebelum pandemi</label>
-      <input v-model="incomeBefore" id="incomeBefore" :class="{ 'border-red-500': v$.incomeBefore.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
+      <input v-model="incomeBefore" @focus="this.incomeBefore = unformatRupiah(this.incomeBefore)" @blur="this.incomeBefore = formatRupiah(this.incomeBefore)" id="incomeBefore" :class="{ 'border-red-500': v$.incomeBefore.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
       <span class="text-red-500" v-if="v$.incomeBefore.$error">
         {{ v$.incomeBefore.$errors[0].$message }}
       </span>
     </div>
     <div class="flex flex-col gap-2">
       <label for="incomeAfter">Penghasilan setelah pandemi</label>
-      <input v-model="incomeAfter" id="incomeAfter" :class="{ 'border-red-500': v$.incomeAfter.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
+      <input v-model="incomeAfter" @focus="this.incomeAfter = unformatRupiah(this.incomeAfter)" @blur="this.incomeAfter = formatRupiah(this.incomeAfter)" id="incomeAfter" :class="{ 'border-red-500': v$.incomeAfter.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
       <span class="text-red-500" v-if="v$.incomeAfter.$error">
         {{ v$.incomeAfter.$errors[0].$message }}
       </span>
@@ -173,7 +173,7 @@
 
 <script>
 import useVuelidate from "@vuelidate/core";
-import { required, helpers } from "@vuelidate/validators";
+import { required, helpers, numeric } from "@vuelidate/validators";
 import Modal from "./Modal.vue";
 
 export default {
@@ -257,8 +257,18 @@ export default {
       address: { required: helpers.withMessage("Alamat tidak boleh kosong!", required) },
       rt: { required: helpers.withMessage("RT tidak boleh kosong!", required) },
       rw: { required: helpers.withMessage("RT tidak boleh kosong!", required) },
-      incomeBefore: { required: helpers.withMessage("Pendapatan sebelum pandemi tidak boleh kosong!", required) },
-      incomeAfter: { required: helpers.withMessage("Pendpatan setelah pandemi tidak boleh kosong!", required) },
+      incomeBefore: {
+        required: helpers.withMessage("Pendapatan sebelum pandemi tidak boleh kosong!", required),
+        numeric: helpers.withMessage("Pendapatan sebelum pandemi harus berupa angka", function (event) {
+          return Number.isInteger(parseInt(this.unformatRupiah(event)));
+        }),
+      },
+      incomeAfter: {
+        required: helpers.withMessage("Pendpatan setelah pandemi tidak boleh kosong!", required),
+        numeric: helpers.withMessage("Pendapatan setelah pandemi harus berupa angka", function (event) {
+          return Number.isInteger(parseInt(this.unformatRupiah(event)));
+        }),
+      },
       reason: { required: helpers.withMessage("Alasan tidak boleh kosong!", required) },
       other_reason: {
         required: helpers.withMessage("Alasan tidak boleh kosong!", function (event) {
@@ -305,16 +315,35 @@ export default {
         .then((response) => response.json())
         .then((villages) => (this.villages = villages));
     },
+    formatRupiah(value) {
+      if (!value) {
+        return value;
+      }
+      value = Number(value.replace(",", "."));
+      const formatter = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      });
+      return formatter.format(value);
+    },
+    unformatRupiah(value) {
+      if (!value) {
+        return value;
+      }
+      return value.replace(".", "").replace(",", ".").replace("Rp", "").replace(/\s/g, "");
+    },
     closeModal: function () {
       this.modal.show = false;
       this.load = false;
     },
     submit: function () {
       this.v$.$validate();
+
+      let modal = this.modal;
       if (!this.v$.$error) {
         this.load = true;
 
-        let modal = this.modal;
         setTimeout(function () {
           let randomInt = Math.floor(Math.random() * 10);
           if (randomInt > 5) {
@@ -329,6 +358,11 @@ export default {
             modal.statusCode = 404;
           }
         }, 1500);
+      } else {
+        modal.show = true;
+        modal.message = "Periksa kembali data yang anda kirim!";
+        modal.responseText = "Gagal!";
+        modal.statusCode = 403;
       }
     },
   },
