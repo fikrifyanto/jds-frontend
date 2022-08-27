@@ -133,9 +133,18 @@
     </div>
     <div class="flex flex-col gap-2">
       <label for="reason">Alasan membutuhkan bantuan</label>
-      <textarea v-model="reason" id="reason" :class="{ 'border-red-500': v$.reason.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded p-3 h-28 focus:outline-none" />
+      <select v-model="reason" :class="{ 'border-red-500': v$.reason.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none">
+        <option value="Kehilangan pekerjaan">Kehilangan pekerjaan</option>
+        <option value="Kepala keluarga terdampak atau korban Covid-19">Kepala keluarga terdampak atau korban Covid-19</option>
+        <option value="Tergolong fakir/miskin semenjak sebelum Covid-19">Tergolong fakir/miskin semenjak sebelum Covid-19</option>
+        <option value="others">Lainnya</option>
+      </select>
       <span class="text-red-500" v-if="v$.reason.$error">
         {{ v$.reason.$errors[0].$message }}
+      </span>
+      <textarea v-model="other_reason" v-if="this.reason == 'others'" :class="{ 'border-red-500': v$.other_reason.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded p-3 h-28 focus:outline-none" placeholder="Tuliskan disini" />
+      <span class="text-red-500" v-if="v$.other_reason.$error && this.reason == 'others'">
+        {{ v$.other_reason.$errors[0].$message }}
       </span>
     </div>
     <div class="flex flex-col my-3">
@@ -206,6 +215,7 @@ export default {
       incomeBefore: null,
       incomeAfter: null,
       reason: null,
+      other_reason: null,
       terms: false,
     };
   },
@@ -250,6 +260,17 @@ export default {
       incomeBefore: { required: helpers.withMessage("Pendapatan sebelum pandemi tidak boleh kosong!", required) },
       incomeAfter: { required: helpers.withMessage("Pendpatan setelah pandemi tidak boleh kosong!", required) },
       reason: { required: helpers.withMessage("Alasan tidak boleh kosong!", required) },
+      other_reason: {
+        required: helpers.withMessage("Alasan tidak boleh kosong!", function (event) {
+          if (this.reason == "others") {
+            if (event && event != "") {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        }),
+      },
       terms: {
         required: helpers.withMessage("Mohon centang terlebih dahulu!", function (event) {
           if (event == false) {
@@ -292,8 +313,8 @@ export default {
       this.v$.$validate();
       if (!this.v$.$error) {
         this.load = true;
-        let modal = this.modal;
 
+        let modal = this.modal;
         setTimeout(function () {
           let randomInt = Math.floor(Math.random() * 10);
           if (randomInt > 5) {
