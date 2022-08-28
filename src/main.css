@@ -16,3 +16,8 @@
     -moz-appearance: textfield;
   }
 }
+
+.overflow-show-scroll {
+  overflow: -moz-scrollbars-vertical;
+  overflow: -moz-scrollbars-horizontal;
+}

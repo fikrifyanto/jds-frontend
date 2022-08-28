@@ -1,5 +1,5 @@
 <template>
-  <form class="flex flex-col gap-4 w-[90vw] md:w-[60vw] lg:w-[35vw]">
+  <form class="flex flex-col gap-4 w-[90vw] md:w-[60vw] lg:w-[35vw] mt-20">
     <div class="flex flex-col gap-2">
       <label for="name">Nama</label>
       <input v-model="name" id="name" :class="{ 'border-red-500': v$.name.$error }" class="focus:border-green-500 border-2 border-w4c-black-13 rounded px-3 h-10 focus:outline-none" type="text" />
@@ -199,6 +199,14 @@ export default {
       kk: null,
       ktp_picture: null,
       kk_picture: null,
+      ktp_picture_file: {
+        name: null,
+        blob: null,
+      },
+      kk_picture_file: {
+        name: null,
+        blob: null,
+      },
       age: null,
       gender: null,
       province: null,
@@ -333,6 +341,13 @@ export default {
       }
       return value.replace(".", "").replace(",", ".").replace("Rp", "").replace(/\s/g, "");
     },
+    savePicture(file, localName) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        localStorage.setItem(localName, reader.result);
+      };
+      reader.readAsDataURL(file);
+    },
     closeModal: function () {
       this.modal.show = false;
       this.load = false;
@@ -341,16 +356,46 @@ export default {
       this.v$.$validate();
 
       let modal = this.modal;
+      let router = this.$router;
       if (!this.v$.$error) {
         this.load = true;
 
+        // save KTP File
+        this.savePicture(this.ktp_picture[0], "ktp_picture_blob");
+        this.ktp_picture_file.name = this.ktp_picture[0].name;
+        this.ktp_picture_file.blob = localStorage.getItem("ktp_picture_blob");
+
+        // save KK File
+        this.savePicture(this.kk_picture[0], "kk_picture_blob");
+        this.kk_picture_file.name = this.kk_picture[0].name;
+        this.kk_picture_file.blob = localStorage.getItem("kk_picture_blob");
+
+        console.log(this.kk_picture_file, this.ktp_picture_file);
+
+        let data = this.$data;
+
         setTimeout(function () {
           let randomInt = Math.floor(Math.random() * 10);
-          if (randomInt > 5) {
+          if (randomInt) {
             modal.show = true;
             modal.message = "Data telah dikirim!";
             modal.responseText = "Berhasil!";
             modal.statusCode = 200;
+
+            let _data = [];
+            let exists = localStorage.getItem("data");
+            if (exists) {
+              _data = JSON.parse(localStorage.getItem("data"));
+              _data.push(data);
+              localStorage.setItem("data", JSON.stringify(_data));
+            } else {
+              _data = JSON.stringify([data]);
+              localStorage.setItem("data", _data);
+            }
+
+            setTimeout(function () {
+              router.push({ name: "Data Penerima Bansos" });
+            }, 3000);
           } else {
             modal.show = true;
             modal.message = "Terjadi kesalahan! \n Silahkan coba beberapa saat lagi!";
