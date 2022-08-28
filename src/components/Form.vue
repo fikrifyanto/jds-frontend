@@ -173,7 +173,7 @@
 
 <script>
 import useVuelidate from "@vuelidate/core";
-import { required, helpers, numeric } from "@vuelidate/validators";
+import { required, helpers, minValue } from "@vuelidate/validators";
 import Modal from "./Modal.vue";
 
 export default {
@@ -256,7 +256,10 @@ export default {
           return true;
         }),
       },
-      age: { required: helpers.withMessage("Umur tidak boleh kosong!", required) },
+      age: {
+        required: helpers.withMessage("Umur tidak boleh kosong!", required),
+        minValue: helpers.withMessage("Umur harus lebih atau sama dengan 25!", minValue(25)),
+      },
       gender: { required: helpers.withMessage("Jenis Kelamin tidak boleh kosong!", required) },
       province: { required: helpers.withMessage("Provinsi tidak boleh kosong!", required) },
       regency: { required: helpers.withMessage("Kab/Kota tidak boleh kosong!", required) },
@@ -370,13 +373,11 @@ export default {
         this.kk_picture_file.name = this.kk_picture[0].name;
         this.kk_picture_file.blob = localStorage.getItem("kk_picture_blob");
 
-        console.log(this.kk_picture_file, this.ktp_picture_file);
-
         let data = this.$data;
 
         setTimeout(function () {
           let randomInt = Math.floor(Math.random() * 10);
-          if (randomInt) {
+          if (randomInt > 5) {
             modal.show = true;
             modal.message = "Data telah dikirim!";
             modal.responseText = "Berhasil!";
@@ -395,7 +396,7 @@ export default {
 
             setTimeout(function () {
               router.push({ name: "Data Penerima Bansos" });
-            }, 3000);
+            }, 1500);
           } else {
             modal.show = true;
             modal.message = "Terjadi kesalahan! \n Silahkan coba beberapa saat lagi!";

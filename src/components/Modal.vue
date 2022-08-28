@@ -20,7 +20,7 @@
             <h2 class="font-semibold text-2xl">{{ this.responseText }}</h2>
             <p class="my-4">{{ this.message }}</p>
           </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex justify-center">
+          <div class="px-4 py-3 sm:px-6 sm:flex justify-center">
             <button @click="close" type="button" class="w-full bg-green-500 hover:bg-green-600 px-5 py-3 leading-5 rounded-full font-semibold text-white">Kembali</button>
           </div>
         </div>
